@@ -93,7 +93,9 @@ const Icons = {
   ChevronDown: ({ className = "" }) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>,
   ArrowRight: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>,
   Lock: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>,
-  Eye: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+  Eye: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>,
+  Cards: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>,
+  Rows: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
 };
 
 const SingleSelect = ({ options, value, onChange, placeholder = "Select...", formatLabel }) => {
@@ -146,9 +148,8 @@ const SingleSelect = ({ options, value, onChange, placeholder = "Select...", for
             return (
               <div
                 key={optVal || 'empty-option'}
-                className={`px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F5F3F0] flex justify-between items-center text-[#1A1A1A] transition-colors ${
-                  isSelected ? 'bg-[#F5F3F0] font-medium' : ''
-                }`}
+                className={`px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F5F3F0] flex justify-between items-center text-[#1A1A1A] transition-colors ${isSelected ? 'bg-[#F5F3F0] font-medium' : ''
+                  }`}
                 onClick={() => {
                   onChange(optVal);
                   setIsOpen(false);
@@ -469,7 +470,7 @@ const LandingPage = ({ onEnter }) => {
 
   return (
     <div className="min-h-screen paper-texture font-body text-[#1A1A1A] selection:bg-[#E8E4DF] selection:text-[#1A1A1A] relative overflow-hidden">
-      
+
       {/* Background Glow */}
       <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-[#B8860B]/2 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -477,8 +478,8 @@ const LandingPage = ({ onEnter }) => {
       <header className="border-b border-[#E8E4DF]/60 bg-[#FAFAF8]/80 backdrop-blur sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex flex-col cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <span className="font-display text-2xl italic font-semibold tracking-wide text-[#1A1A1A]">SocioGraph</span>
-            <span className="small-caps text-[9px] text-[#6B6B6B]">The Network Archive</span>
+            <h1 className="font-display text-3xl font-semibold tracking-wide italic text-[#1A1815]">The Network</h1>
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C877D] font-display font-bold">Personal Archive</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <a href="#philosophy" className="text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Philosophy</a>
@@ -527,7 +528,7 @@ const LandingPage = ({ onEnter }) => {
           <div className="pt-10">
             <div className="mx-auto max-w-lg bg-white border border-[#E8E4DF] p-8 text-left rounded-sm shadow-lg relative group">
               <div className="absolute top-0 left-0 right-0 h-1 bg-[#B8860B]"></div>
-              
+
               <div className="flex justify-between items-start border-b border-[#E8E4DF] pb-4 mb-4">
                 <div>
                   <h4 className="font-display text-2xl text-[#1A1A1A] font-semibold italic">Eleanor Vance</h4>
@@ -579,7 +580,7 @@ const LandingPage = ({ onEnter }) => {
             <div className="md:col-span-5 bg-white border border-[#E8E4DF] p-8 rounded-sm shadow-sm space-y-4">
               <span className="small-caps text-[#B8860B] text-[10px]">The Manifesto</span>
               <p className="text-sm text-[#1A1A1A] leading-relaxed italic">
-                “SocioGraph is designed as a digital ledger for the thoughtful curator. It doesn’t send notifications, it doesn’t sync contact lists automatically, and it won’t summarize relationships with AI. You write what matters, tag with intent, and reflect on the ties that bind.”
+                “The Network is designed as a digital ledger for the thoughtful curator. It doesn’t send notifications, it doesn’t sync contact lists automatically, and it won’t summarize relationships with AI. You write what matters, tag with intent, and reflect on the ties that bind.”
               </p>
               <p className="text-xs text-[#6B6B6B] text-right font-mono">— The Colophon Office</p>
             </div>
@@ -655,11 +656,10 @@ const LandingPage = ({ onEnter }) => {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={() => setActiveSandboxIntent('all')}
-                className={`px-4 py-1.5 rounded-sm font-mono text-xs uppercase tracking-widest border transition-all cursor-pointer ${
-                  activeSandboxIntent === 'all'
+                className={`px-4 py-1.5 rounded-sm font-mono text-xs uppercase tracking-widest border transition-all cursor-pointer ${activeSandboxIntent === 'all'
                     ? 'bg-[#1A1A1A] text-[#FAFAF8] border-transparent'
                     : 'bg-transparent text-[#6B6B6B] border-[#E8E4DF] hover:text-[#1A1A1A] hover:border-[#1A1A1A]'
-                }`}
+                  }`}
               >
                 All Intents
               </button>
@@ -667,11 +667,10 @@ const LandingPage = ({ onEnter }) => {
                 <button
                   key={intent}
                   onClick={() => setActiveSandboxIntent(intent)}
-                  className={`px-4 py-1.5 rounded-sm font-mono text-xs uppercase tracking-widest border transition-all cursor-pointer ${
-                    activeSandboxIntent === intent
+                  className={`px-4 py-1.5 rounded-sm font-mono text-xs uppercase tracking-widest border transition-all cursor-pointer ${activeSandboxIntent === intent
                       ? 'bg-[#1A1A1A] text-[#FAFAF8] border-transparent'
                       : 'bg-transparent text-[#6B6B6B] border-[#E8E4DF] hover:text-[#1A1A1A] hover:border-[#1A1A1A]'
-                  }`}
+                    }`}
                 >
                   {intent}
                 </button>
@@ -719,7 +718,7 @@ const LandingPage = ({ onEnter }) => {
         <section id="colophon" className="scroll-mt-24 max-w-xl mx-auto">
           <div className="bg-white border border-[#E8E4DF] p-10 rounded-sm shadow-lg text-center relative">
             <div className="absolute inset-0 border border-[#B8860B]/30 m-1 pointer-events-none rounded-sm"></div>
-            
+
             <h3 className="font-display text-3xl italic text-[#1A1A1A] mb-3">Request Registry Entry</h3>
             <p className="text-sm text-[#6B6B6B] leading-relaxed mb-6 font-light">
               Registry access is currently hand-curated. Enter your email to request admission to the private archive.
@@ -754,7 +753,7 @@ const LandingPage = ({ onEnter }) => {
       {/* Footer */}
       <footer className="border-t border-[#E8E4DF] py-12 bg-[#F5F3F0]/40 text-center text-xs text-[#6B6B6B] font-mono tracking-wide">
         <div className="max-w-5xl mx-auto px-6 space-y-4">
-          <p className="small-caps text-[10px] text-[#B8860B]">SOCIOGRAPH ARCHIVAL FOUNDATION</p>
+          <p className="small-caps text-[10px] text-[#B8860B]">The Network · Personal Archive</p>
           <p className="italic font-display text-sm text-[#1A1A1A]">“To nurture a bond is to preserve a context.”</p>
           <div className="flex justify-center gap-6 text-[10px] uppercase">
             <a href="#philosophy" className="hover:text-[#1A1A1A]">Philosophy</a>
@@ -763,7 +762,7 @@ const LandingPage = ({ onEnter }) => {
             <span>•</span>
             <a href="#" onClick={(e) => { e.preventDefault(); onEnter(); }} className="hover:text-[#1A1A1A]">Private Console</a>
           </div>
-          <p className="text-[10px] text-[#6B6B6B]/60 mt-4">© 2026 SocioGraph. MIT License. Hand-crafted for operators of taste.</p>
+          <p className="text-[10px] text-[#6B6B6B]/60 mt-4">© 2026 The Network. MIT License. Hand-crafted for operators of taste.</p>
         </div>
       </footer>
     </div>
@@ -799,6 +798,21 @@ function NetworkRolodex({ onBack }) {
   const [filterIntent, setFilterIntent] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [sortBy, setSortBy] = useState('recent_interaction'); // recent_interaction, oldest_interaction, name_asc
+  const [layoutMode, setLayoutMode] = useState(() => {
+    try {
+      return localStorage.getItem('sociograph-layout') === 'compact' ? 'compact' : 'cards';
+    } catch {
+      return 'cards';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sociograph-layout', layoutMode);
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [layoutMode]);
 
   useEffect(() => {
     // Initialize Supabase Client directly with imported package or fallback
@@ -974,7 +988,7 @@ function NetworkRolodex({ onBack }) {
       <header className="border-b border-[#E8E4DF] bg-[#FAFAF8]/80 backdrop-blur sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={onBack}
               className="text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider cursor-pointer"
             >
@@ -982,8 +996,8 @@ function NetworkRolodex({ onBack }) {
             </button>
             <div className="h-4 w-px bg-[#E8E4DF]"></div>
             <div className="flex flex-col">
-              <h1 className="font-display text-2xl font-semibold tracking-wide italic text-[#1A1A1A]">The Archive</h1>
-              <span className="small-caps text-[9px] text-[#6B6B6B]">Personal Registry console</span>
+              <h1 className="font-display text-3xl font-semibold tracking-wide italic text-[#1A1815]">The Network</h1>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C877D] font-display font-bold">Personal Archive</span>
             </div>
           </div>
           <button
@@ -1071,8 +1085,38 @@ function NetworkRolodex({ onBack }) {
           </div>
         </div>
 
-        {/* Right Content - Grid */}
-        <section className="flex-1 w-full">
+        {/* Right Content - Grid / Compact */}
+        <section className="flex-1 w-full min-w-0">
+          {!loading && (
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6B6B6B]">
+                {processedPeople.length} {processedPeople.length === 1 ? 'entry' : 'entries'}
+              </p>
+              <div className="inline-flex border border-[#E8E4DF] rounded-sm overflow-hidden" role="group" aria-label="Layout">
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('cards')}
+                  className={`px-2.5 py-1.5 min-h-[36px] flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-mono cursor-pointer transition-colors ${layoutMode === 'cards' ? 'bg-[#1A1A1A] text-[#FAFAF8]' : 'bg-white text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F5F3F0]'
+                    }`}
+                  aria-pressed={layoutMode === 'cards'}
+                  title="Card view"
+                >
+                  <Icons.Cards /> <span className="hidden sm:inline">Cards</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('compact')}
+                  className={`px-2.5 py-1.5 min-h-[36px] flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-mono cursor-pointer transition-colors border-l border-[#E8E4DF] ${layoutMode === 'compact' ? 'bg-[#1A1A1A] text-[#FAFAF8]' : 'bg-white text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-[#F5F3F0]'
+                    }`}
+                  aria-pressed={layoutMode === 'compact'}
+                  title="Compact rows"
+                >
+                  <Icons.Rows /> <span className="hidden sm:inline">Compact</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64 opacity-50">
               <div className="w-8 h-8 border-t-2 border-[#B8860B] rounded-full animate-spin mb-4"></div>
@@ -1089,11 +1133,62 @@ function NetworkRolodex({ onBack }) {
                 <Icons.Plus /> Add First Entry
               </button>
             </div>
+          ) : layoutMode === 'compact' ? (
+            <div className="border border-[#E8E4DF] bg-white rounded-sm overflow-hidden">
+              <div className="hidden md:grid grid-cols-[minmax(0,1.4fr)_minmax(0,1.3fr)_minmax(0,0.7fr)_minmax(0,0.85fr)_minmax(0,1fr)_auto] gap-3 px-3 py-2 bg-[#F5F3F0] border-b border-[#E8E4DF] text-[9px] uppercase tracking-[0.16em] font-mono text-[#6B6B6B]">
+                <span>Name</span>
+                <span>Affiliation</span>
+                <span>Location</span>
+                <span>Last contact</span>
+                <span>Intent</span>
+                <span className="w-16" />
+              </div>
+              <div className="divide-y divide-[#E8E4DF]">
+                {processedPeople.map(person => {
+                  const affiliation = person.company
+                    ? `${person.role ? `${person.role.replace('_', ' ')} · ` : ''}${person.company}`
+                    : (person.role ? person.role.replace('_', ' ') : '—');
+                  const lastContact = person.last_interaction
+                    ? new Date(person.last_interaction).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+                    : '—';
+
+                  return (
+                    <div
+                      key={person.id}
+                      title={person.notes || undefined}
+                      className="group grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1.3fr)_minmax(0,0.7fr)_minmax(0,0.85fr)_minmax(0,1fr)_auto] gap-1 md:gap-3 items-center px-3 py-2 hover:bg-[#F5F3F0] transition-colors"
+                    >
+                      <div className="min-w-0 flex items-baseline justify-between gap-2 md:block">
+                        <h3 className="font-display text-base md:text-[17px] text-[#1A1A1A] font-semibold italic leading-tight truncate">{person.name}</h3>
+                        <span className="md:hidden text-[10px] text-[#6B6B6B] shrink-0">{lastContact}</span>
+                      </div>
+                      <p className="text-xs text-[#6B6B6B] capitalize truncate">{affiliation}</p>
+                      <p className="hidden md:block text-xs text-[#6B6B6B] truncate">{person.location || '—'}</p>
+                      <p className="hidden md:block text-xs text-[#6B6B6B] tabular-nums">{lastContact}</p>
+                      <div className="flex flex-wrap gap-1 min-w-0">
+                        {(person.intent || []).slice(0, 2).map(int => (
+                          <span key={int} className="text-[9px] uppercase tracking-wider bg-[#F5F3F0] group-hover:bg-white text-[#1A1A1A] px-1.5 py-0.5 rounded-sm border border-[#E8E4DF] truncate max-w-[7rem]">
+                            {int.replace('_', ' ')}
+                          </span>
+                        ))}
+                        {(person.intent || []).length > 2 && (
+                          <span className="text-[9px] font-mono text-[#6B6B6B]">+{person.intent.length - 2}</span>
+                        )}
+                      </div>
+                      <div className="flex gap-0.5 justify-end opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openEditModal(person)} className="p-1.5 text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-white transition-colors rounded-sm cursor-pointer" title="Edit"><Icons.Edit /></button>
+                        <button onClick={() => handleDelete(person.id)} className="p-1.5 text-[#6B6B6B] hover:text-red-800 hover:bg-red-50 transition-colors rounded-sm cursor-pointer" title="Delete"><Icons.Trash /></button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {processedPeople.map(person => (
                 <div key={person.id} className="group relative bg-white border border-[#E8E4DF] p-6 transition-all hover:shadow-[0_8px_30px_rgba(26,26,26,0.04)] hover:-translate-y-1 rounded-sm flex flex-col justify-between">
-                  
+
                   <div>
                     {/* Actions overlay */}
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
