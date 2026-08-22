@@ -73,6 +73,13 @@ const INTENTS = [
   'connector',
   'community'
 ];
+
+const SORT_OPTIONS = [
+  { value: 'recent_interaction', label: 'Most Recent Interaction' },
+  { value: 'oldest_interaction', label: 'Oldest Interaction' },
+  { value: 'name_asc', label: 'Alphabetical (A-Z)' }
+];
+
 const injectStyles = () => {
   if (document.getElementById('editorial-styles')) return;
   const style = document.createElement('style');
@@ -106,7 +113,77 @@ const Icons = {
   Trash: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
   Calendar: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
   MapPin: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>,
-  Check: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  Check: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+  ChevronDown: ({ className = "" }) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"></polyline></svg>
+};
+
+const SingleSelect = ({ options, value, onChange, placeholder = "Select...", formatLabel }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getOptionValue = (opt) => (typeof opt === 'object' && opt !== null ? opt.value : opt);
+  const getOptionLabel = (opt) => {
+    if (typeof opt === 'object' && opt !== null) return opt.label;
+    if (formatLabel) return formatLabel(opt);
+    return opt;
+  };
+
+  const selectedOption = options.find(opt => getOptionValue(opt) === value);
+  const displayLabel = selectedOption ? getOptionLabel(selectedOption) : '';
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div
+        className="w-full bg-transparent border-b border-[#D1CEC7] py-2 cursor-pointer flex justify-between items-center min-h-[38px] transition-colors hover:border-[#2C2A25] group select-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {value ? (
+          <span className="text-[#2C2A25] font-body text-sm capitalize truncate pr-2">{displayLabel}</span>
+        ) : (
+          <span className="text-[#A39E93] font-body text-sm">{placeholder}</span>
+        )}
+        <span className={`text-[#8C877D] transition-transform duration-200 group-hover:text-[#2C2A25] ${isOpen ? 'rotate-180 text-[#2C2A25]' : ''}`}>
+          <Icons.ChevronDown />
+        </span>
+      </div>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 w-full mt-1 bg-[#FDFBF7] border border-[#E6E2D8] shadow-lg z-50 max-h-52 overflow-y-auto rounded-sm">
+          {options.map((option) => {
+            const optVal = getOptionValue(option);
+            const optLabel = getOptionLabel(option);
+            const isSelected = optVal === value;
+
+            return (
+              <div
+                key={optVal || 'empty-option'}
+                className={`px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F4F1EA] flex justify-between items-center text-[#2C2A25] transition-colors ${
+                  isSelected ? 'bg-[#F4F1EA] font-medium' : ''
+                }`}
+                onClick={() => {
+                  onChange(optVal);
+                  setIsOpen(false);
+                }}
+              >
+                <span className="capitalize truncate pr-2">{optLabel || placeholder}</span>
+                {isSelected && <Icons.Check />}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 };
 
 const MultiSelect = ({ options, selected = [], onChange, placeholder }) => {
@@ -134,7 +211,7 @@ const MultiSelect = ({ options, selected = [], onChange, placeholder }) => {
   return (
     <div className="relative" ref={containerRef}>
       <div
-        className="w-full bg-transparent border-b border-[#D1CEC7] py-2 cursor-pointer flex flex-wrap gap-1 items-center min-h-[38px] transition-colors hover:border-[#2C2A25]"
+        className="w-full bg-transparent border-b border-[#D1CEC7] py-2 cursor-pointer flex flex-wrap gap-1 items-center min-h-[38px] transition-colors hover:border-[#2C2A25] select-none"
         onClick={() => setIsOpen(!isOpen)}
       >
         {selected.length === 0 ? (
@@ -142,22 +219,22 @@ const MultiSelect = ({ options, selected = [], onChange, placeholder }) => {
         ) : (
           selected.map(item => (
             <span key={item} className="bg-[#2C2A25] text-[#FDFBF7] text-xs px-2 py-0.5 rounded-sm font-body tracking-wide capitalize flex items-center gap-1">
-              {item}
-              <span className="hover:text-red-300" onClick={(e) => { e.stopPropagation(); toggleOption(item); }}>×</span>
+              {item.replace('_', ' ')}
+              <span className="hover:text-red-300 ml-0.5" onClick={(e) => { e.stopPropagation(); toggleOption(item); }}>×</span>
             </span>
           ))
         )}
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 w-full mt-1 bg-[#FDFBF7] border border-[#E6E2D8] shadow-lg z-50 max-h-48 overflow-y-auto rounded-sm">
+        <div className="absolute top-full left-0 w-full mt-1 bg-[#FDFBF7] border border-[#E6E2D8] shadow-lg z-50 max-h-52 overflow-y-auto rounded-sm">
           {options.map(option => (
             <div
               key={option}
-              className="px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F4F1EA] flex justify-between items-center text-[#2C2A25]"
+              className="px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F4F1EA] flex justify-between items-center text-[#2C2A25] transition-colors"
               onClick={() => toggleOption(option)}
             >
-              <span className="capitalize">{option}</span>
+              <span className="capitalize">{option.replace('_', ' ')}</span>
               {selected.includes(option) && <Icons.Check />}
             </div>
           ))}
@@ -177,7 +254,8 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
     first_met: '',
     last_interaction_date: '',
     interaction_type: '',
-    intent: []
+    intent: [],
+    notes: ''
   });
 
   useEffect(() => {
@@ -190,10 +268,22 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
         interaction_type: person.interaction_type || '',
         role: person.role || '',
         location: person.location || '',
-        met_at: person.met_at || ''
+        met_at: person.met_at || '',
+        notes: person.notes || ''
       });
     } else {
-      setFormData({ name: '', company: '', role: '', location: '', met_at: '', first_met: '', last_interaction_date: '', interaction_type: '', intent: [] });
+      setFormData({
+        name: '',
+        company: '',
+        role: '',
+        location: '',
+        met_at: '',
+        first_met: '',
+        last_interaction_date: '',
+        interaction_type: '',
+        intent: [],
+        notes: ''
+      });
     }
   }, [person, isOpen]);
 
@@ -216,7 +306,7 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
       <div className="relative bg-[#FDFBF7] paper-texture border border-[#E6E2D8] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm flex flex-col">
         <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur border-b border-[#E6E2D8] p-6 flex justify-between items-center z-10">
           <h2 className="font-display text-2xl text-[#2C2A25] italic">{person ? 'Edit Profile' : 'New Entry'}</h2>
-          <button onClick={onClose} className="text-[#8C877D] hover:text-[#2C2A25] transition-colors"><Icons.X /></button>
+          <button onClick={onClose} className="text-[#8C877D] hover:text-[#2C2A25] transition-colors cursor-pointer"><Icons.X /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8">
@@ -232,26 +322,35 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
 
           <div>
             <Label>Role</Label>
-            <select name="role" value={formData.role} onChange={handleChange} className={InputCls}>
-              <option value="">Select a role...</option>
-              {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
+            <SingleSelect
+              options={['', ...ROLES]}
+              value={formData.role}
+              onChange={(val) => setFormData({ ...formData, role: val })}
+              placeholder="Select a role..."
+              formatLabel={(r) => r ? r.replace('_', ' ') : 'None'}
+            />
           </div>
 
           <div>
             <Label>Location</Label>
-            <select name="location" value={formData.location} onChange={handleChange} className={InputCls}>
-              <option value="">Select location...</option>
-              {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
+            <SingleSelect
+              options={['', ...LOCATIONS]}
+              value={formData.location}
+              onChange={(val) => setFormData({ ...formData, location: val })}
+              placeholder="Select location..."
+              formatLabel={(l) => l || 'None'}
+            />
           </div>
 
           <div>
             <Label>Met At</Label>
-            <select name="met_at" value={formData.met_at} onChange={handleChange} className={InputCls}>
-              <option value="">Select origin...</option>
-              {MET_AT.map(m => <option key={m} value={m} className="capitalize">{m}</option>)}
-            </select>
+            <SingleSelect
+              options={['', ...MET_AT]}
+              value={formData.met_at}
+              onChange={(val) => setFormData({ ...formData, met_at: val })}
+              placeholder="Select origin..."
+              formatLabel={(m) => m ? m.replace('_', ' ') : 'None'}
+            />
           </div>
 
           <div>
@@ -270,10 +369,13 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
 
           <div>
             <Label>Interaction Medium</Label>
-            <select name="interaction_type" value={formData.interaction_type} onChange={handleChange} className={InputCls}>
-              <option value="">Select medium...</option>
-              {INTERACTION_TYPES.map(i => <option key={i} value={i} className="capitalize">{i.replace('_', ' ')}</option>)}
-            </select>
+            <SingleSelect
+              options={['', ...INTERACTION_TYPES]}
+              value={formData.interaction_type}
+              onChange={(val) => setFormData({ ...formData, interaction_type: val })}
+              placeholder="Select medium..."
+              formatLabel={(i) => i ? i.replace('_', ' ') : 'None'}
+            />
           </div>
 
           <div className="col-span-1 md:col-span-2">
@@ -286,9 +388,21 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
             />
           </div>
 
+          <div className="col-span-1 md:col-span-2">
+            <Label>Notes & Context</Label>
+            <textarea
+              name="notes"
+              value={formData.notes || ''}
+              onChange={handleChange}
+              rows={3}
+              className={`${InputCls} resize-none leading-relaxed`}
+              placeholder="Add background notes, shared interests, topics discussed, or follow-ups..."
+            />
+          </div>
+
           <div className="col-span-1 md:col-span-2 mt-10 flex justify-end gap-4">
-            <button type="button" onClick={onClose} className="px-6 py-2 font-display text-[#4A4843] hover:text-[#2C2A25] transition-colors">Cancel</button>
-            <button type="submit" className="px-8 py-2 bg-[#2C2A25] text-[#FDFBF7] font-display text-lg hover:bg-[#1A1815] transition-colors shadow-md">
+            <button type="button" onClick={onClose} className="px-6 py-2 font-display text-[#4A4843] hover:text-[#2C2A25] transition-colors cursor-pointer">Cancel</button>
+            <button type="submit" className="px-8 py-2 bg-[#2C2A25] text-[#FDFBF7] font-display text-lg hover:bg-[#1A1815] transition-colors shadow-md cursor-pointer">
               {person ? 'Save Changes' : 'Commit to Archive'}
             </button>
           </div>
@@ -382,7 +496,8 @@ export default function NetworkRolodex() {
         // Using last_interaction_date from the form as the timestamp
         last_interaction: personData.last_interaction_date ? new Date(personData.last_interaction_date).toISOString() : null,
         // Convert intent array back to comma separated string for DB
-        intent: personData.intent && personData.intent.length > 0 ? personData.intent.join(',') : null
+        intent: personData.intent && personData.intent.length > 0 ? personData.intent.join(',') : null,
+        notes: personData.notes && personData.notes.trim().length > 0 ? personData.notes.trim() : null
       };
 
       if (personData.id) {
@@ -439,10 +554,14 @@ export default function NetworkRolodex() {
   const processedPeople = useMemo(() => {
     let result = [...people];
 
-    // Search filter
+    // Search filter across name, company, and notes
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(p => p.name.toLowerCase().includes(term) || (p.company && p.company.toLowerCase().includes(term)));
+      result = result.filter(p =>
+        (p.name && p.name.toLowerCase().includes(term)) ||
+        (p.company && p.company.toLowerCase().includes(term)) ||
+        (p.notes && p.notes.toLowerCase().includes(term))
+      );
     }
 
     // Intent filter
@@ -506,7 +625,7 @@ export default function NetworkRolodex() {
             </h3>
             <input
               type="text"
-              placeholder="Name or company..."
+              placeholder="Name, company, or note..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors"
@@ -525,7 +644,7 @@ export default function NetworkRolodex() {
               {INTENTS.map(intent => (
                 <label key={intent} className="flex items-center gap-2 cursor-pointer text-sm capitalize">
                   <input type="radio" name="intent" checked={filterIntent === intent} onChange={() => setFilterIntent(intent)} className="accent-[#1A1815]" />
-                  <span className={filterIntent === intent ? 'font-medium' : 'text-[#706B62]'}>{intent}</span>
+                  <span className={filterIntent === intent ? 'font-medium' : 'text-[#706B62]'}>{intent.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -533,27 +652,22 @@ export default function NetworkRolodex() {
 
           <div>
             <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Role</h3>
-            <select
+            <SingleSelect
+              options={[{ value: '', label: 'All Roles' }, ...ROLES.map(r => ({ value: r, label: r.replace('_', ' ') }))]}
               value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors capitalize cursor-pointer"
-            >
-              <option value="">All Roles</option>
-              {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
+              onChange={(val) => setFilterRole(val)}
+              placeholder="All Roles"
+            />
           </div>
 
           <div>
             <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Order Archive</h3>
-            <select
+            <SingleSelect
+              options={SORT_OPTIONS}
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors cursor-pointer"
-            >
-              <option value="recent_interaction">Most Recent Interaction</option>
-              <option value="oldest_interaction">Oldest Interaction</option>
-              <option value="name_asc">Alphabetical (A-Z)</option>
-            </select>
+              onChange={(val) => setSortBy(val)}
+              placeholder="Select order..."
+            />
           </div>
         </aside>
 
@@ -566,11 +680,14 @@ export default function NetworkRolodex() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-w-[150px] flex-1 bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none"
           />
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent border-b border-[#D1CEC7] text-sm py-1.5">
-            <option value="recent_interaction">Sort: Recent</option>
-            <option value="oldest_interaction">Sort: Oldest</option>
-            <option value="name_asc">Sort: A-Z</option>
-          </select>
+          <div className="min-w-[140px]">
+            <SingleSelect
+              options={SORT_OPTIONS}
+              value={sortBy}
+              onChange={(val) => setSortBy(val)}
+              placeholder="Sort..."
+            />
+          </div>
         </div>
 
         {/* Right Content - Grid */}
@@ -594,43 +711,52 @@ export default function NetworkRolodex() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {processedPeople.map(person => (
-                <div key={person.id} className="group relative bg-[#FDFBF7] border border-[#E6E2D8] p-6 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 rounded-sm">
+                <div key={person.id} className="group relative bg-[#FDFBF7] border border-[#E6E2D8] p-6 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 rounded-sm flex flex-col justify-between">
+                  
+                  <div>
+                    {/* Actions overlay */}
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <button onClick={() => openEditModal(person)} className="p-1.5 text-[#8C877D] hover:text-[#1A1815] hover:bg-[#F4F1EA] transition-colors rounded-sm cursor-pointer" title="Edit"><Icons.Edit /></button>
+                      <button onClick={() => handleDelete(person.id)} className="p-1.5 text-[#8C877D] hover:text-red-800 hover:bg-red-50 transition-colors rounded-sm cursor-pointer" title="Delete"><Icons.Trash /></button>
+                    </div>
 
-                  {/* Actions overlay */}
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                    <button onClick={() => openEditModal(person)} className="p-1.5 text-[#8C877D] hover:text-[#1A1815] hover:bg-[#F4F1EA] transition-colors rounded-sm cursor-pointer" title="Edit"><Icons.Edit /></button>
-                    <button onClick={() => handleDelete(person.id)} className="p-1.5 text-[#8C877D] hover:text-red-800 hover:bg-red-50 transition-colors rounded-sm cursor-pointer" title="Delete"><Icons.Trash /></button>
-                  </div>
+                    <div className="border-b border-[#E6E2D8] pb-4 mb-4">
+                      <h3 className="font-display text-2xl text-[#1A1815] font-semibold leading-tight">{person.name}</h3>
+                      {person.company && <p className="text-sm text-[#706B62] mt-1">{person.role ? `${person.role.replace('_', ' ')} at ` : ''}<span className="font-medium text-[#4A4843]">{person.company}</span></p>}
+                      {!person.company && person.role && <p className="text-sm text-[#706B62] mt-1 capitalize">{person.role.replace('_', ' ')}</p>}
+                    </div>
 
-                  <div className="border-b border-[#E6E2D8] pb-4 mb-4">
-                    <h3 className="font-display text-2xl text-[#1A1815] font-semibold leading-tight">{person.name}</h3>
-                    {person.company && <p className="text-sm text-[#706B62] mt-1">{person.role ? `${person.role} at ` : ''}<span className="font-medium text-[#4A4843]">{person.company}</span></p>}
-                    {!person.company && person.role && <p className="text-sm text-[#706B62] mt-1 capitalize">{person.role}</p>}
-                  </div>
+                    <div className="space-y-2.5 mb-4">
+                      {person.location && (
+                        <div className="flex items-center gap-2 text-xs text-[#706B62]">
+                          <Icons.MapPin /> {person.location}
+                        </div>
+                      )}
+                      {person.first_met && (
+                        <div className="flex items-center gap-2 text-xs text-[#8C877D]">
+                          <Icons.Calendar /> First met: {new Date(person.first_met).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })} {person.met_at ? `(${person.met_at.replace('_', ' ')})` : ''}
+                        </div>
+                      )}
+                      {person.last_interaction && (
+                        <div className="flex items-center gap-2 text-xs text-[#706B62]">
+                          <Icons.Calendar /> Last contact: {new Date(person.last_interaction).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="space-y-3 mb-5">
-                    {person.location && (
-                      <div className="flex items-center gap-2 text-xs text-[#706B62]">
-                        <Icons.MapPin /> {person.location}
-                      </div>
-                    )}
-                    {person.first_met && (
-                      <div className="flex items-center gap-2 text-xs text-[#8C877D]">
-                        <Icons.Calendar /> First met: {new Date(person.first_met).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })} {person.met_at ? `(${person.met_at})` : ''}
-                      </div>
-                    )}
-                    {person.last_interaction && (
-                      <div className="flex items-center gap-2 text-xs text-[#706B62]">
-                        <Icons.Calendar /> Last contact: {new Date(person.last_interaction).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {/* Person Notes */}
+                    {person.notes && (
+                      <div className="mb-4 text-xs italic text-[#5C574F] bg-[#F4F1EA]/70 p-3 rounded-sm border border-[#E6E2D8]/70 leading-relaxed">
+                        <p className="line-clamp-3">"{person.notes}"</p>
                       </div>
                     )}
                   </div>
 
                   {person.intent && person.intent.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-4 border-t border-dashed border-[#E6E2D8]">
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-dashed border-[#E6E2D8] mt-2">
                       {person.intent.map(int => (
                         <span key={int} className="text-[10px] uppercase tracking-wider bg-[#F4F1EA] text-[#4A4843] px-2 py-1 rounded-sm border border-[#E6E2D8]">
-                          {int}
+                          {int.replace('_', ' ')}
                         </span>
                       ))}
                     </div>

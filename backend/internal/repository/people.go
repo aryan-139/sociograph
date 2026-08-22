@@ -26,12 +26,12 @@ func NewPeopleRepo(pool *pgxpool.Pool) *PeopleRepo {
 func (r *PeopleRepo) Create(ctx context.Context, in models.CreatePersonInput) (*models.Person, error) {
 	const q = `
 		INSERT INTO public.people
-			(name, company, role, location, met_at, first_met, last_interaction)
+			(name, company, role, location, met_at, first_met, last_interaction, intent, notes)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING
 			id, name, company, role, location, met_at, first_met, last_interaction,
-			created_at, updated_at`
+			intent, notes, created_at, updated_at`
 
 	row := r.pool.QueryRow(ctx, q,
 		in.Name,
@@ -41,6 +41,8 @@ func (r *PeopleRepo) Create(ctx context.Context, in models.CreatePersonInput) (*
 		in.MetAt,
 		in.FirstMet,
 		in.LastInteraction,
+		in.Intent,
+		in.Notes,
 	)
 
 	return scanPerson(row)
@@ -60,15 +62,16 @@ func (r *PeopleRepo) BulkCreate(ctx context.Context, inputs []models.CreatePerso
 	for _, in := range inputs {
 		const q = `
 			INSERT INTO public.people
-				(name, company, role, location, met_at, first_met, last_interaction)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
+				(name, company, role, location, met_at, first_met, last_interaction, intent, notes)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING
 				id, name, company, role, location, met_at, first_met, last_interaction,
-				created_at, updated_at`
+				intent, notes, created_at, updated_at`
 
 		row := tx.QueryRow(ctx, q,
 			in.Name, in.Company, in.Role, in.Location,
 			in.MetAt, in.FirstMet, in.LastInteraction,
+			in.Intent, in.Notes,
 		)
 
 		p, err := scanPerson(row)
@@ -88,7 +91,7 @@ func (r *PeopleRepo) BulkCreate(ctx context.Context, inputs []models.CreatePerso
 func (r *PeopleRepo) GetByID(ctx context.Context, id pgtype.UUID) (*models.Person, error) {
 	const q = `
 		SELECT id, name, company, role, location, met_at, first_met, last_interaction,
-		       created_at, updated_at
+		       intent, notes, created_at, updated_at
 		FROM public.people
 		WHERE id = $1`
 
@@ -107,11 +110,13 @@ func (r *PeopleRepo) Update(ctx context.Context, id pgtype.UUID, in models.Updat
 			location         = COALESCE($5, location),
 			met_at           = COALESCE($6, met_at),
 			first_met        = COALESCE($7, first_met),
-			last_interaction = COALESCE($8, last_interaction)
+			last_interaction = COALESCE($8, last_interaction),
+			intent           = COALESCE($9, intent),
+			notes            = COALESCE($10, notes)
 		WHERE id = $1
 		RETURNING
 			id, name, company, role, location, met_at, first_met, last_interaction,
-			created_at, updated_at`
+			intent, notes, created_at, updated_at`
 
 	row := r.pool.QueryRow(ctx, q,
 		id,
@@ -122,6 +127,8 @@ func (r *PeopleRepo) Update(ctx context.Context, id pgtype.UUID, in models.Updat
 		in.MetAt,
 		in.FirstMet,
 		in.LastInteraction,
+		in.Intent,
+		in.Notes,
 	)
 	return scanPerson(row)
 }
@@ -153,6 +160,8 @@ func scanPerson(row pgx.Row) (*models.Person, error) {
 		&p.MetAt,
 		&p.FirstMet,
 		&p.LastInteraction,
+		&p.Intent,
+		&p.Notes,
 		&p.CreatedAt,
 		&p.UpdatedAt,
 	)
