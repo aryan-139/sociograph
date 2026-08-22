@@ -59,6 +59,15 @@ const INTERACTION_TYPES = [
   'invitation',
   'other'
 ];
+const RELATIONSHIP_STATUS = [
+  'new',
+  'in_touch',
+  'friend',
+  'close',
+  'need_to_reconnect',
+  'dormant',
+  'lost_touch'
+];
 const INTENTS = [
   'friendship',
   'professional',
@@ -233,7 +242,8 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
     met_at: '',
     first_met: '',
     last_interaction_date: '',
-    interaction_type: '',
+    interaction_medium: '',
+    relationship_status: '',
     intent: [],
     notes: ''
   });
@@ -245,7 +255,8 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
         intent: person.intent || [],
         first_met: person.first_met ? person.first_met.slice(0, 10) : '',
         last_interaction_date: person.last_interaction ? person.last_interaction.slice(0, 10) : (person.last_interaction_date || ''),
-        interaction_type: person.interaction_type || '',
+        interaction_medium: person.interaction_medium || '',
+        relationship_status: person.relationship_status || '',
         role: person.role || '',
         location: person.location || '',
         met_at: person.met_at || '',
@@ -260,7 +271,8 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
         met_at: '',
         first_met: '',
         last_interaction_date: '',
-        interaction_type: '',
+        interaction_medium: '',
+        relationship_status: '',
         intent: [],
         notes: ''
       });
@@ -351,10 +363,21 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
             <Label>Interaction Medium</Label>
             <SingleSelect
               options={['', ...INTERACTION_TYPES]}
-              value={formData.interaction_type}
-              onChange={(val) => setFormData({ ...formData, interaction_type: val })}
+              value={formData.interaction_medium}
+              onChange={(val) => setFormData({ ...formData, interaction_medium: val })}
               placeholder="Select medium..."
               formatLabel={(i) => i ? i.replace('_', ' ') : 'None'}
+            />
+          </div>
+
+          <div>
+            <Label>Relationship Status</Label>
+            <SingleSelect
+              options={['', ...RELATIONSHIP_STATUS]}
+              value={formData.relationship_status}
+              onChange={(val) => setFormData({ ...formData, relationship_status: val })}
+              placeholder="Select status..."
+              formatLabel={(s) => s ? s.replace('_', ' ') : 'None'}
             />
           </div>
 
@@ -883,7 +906,9 @@ function NetworkRolodex({ onBack }) {
         last_interaction: personData.last_interaction_date ? new Date(personData.last_interaction_date).toISOString() : null,
         // Convert intent array back to comma separated string for DB
         intent: personData.intent && personData.intent.length > 0 ? personData.intent.join(',') : null,
-        notes: personData.notes && personData.notes.trim().length > 0 ? personData.notes.trim() : null
+        notes: personData.notes && personData.notes.trim().length > 0 ? personData.notes.trim() : null,
+        interaction_medium: personData.interaction_medium || null,
+        relationship_status: personData.relationship_status || null
       };
 
       if (personData.id) {
