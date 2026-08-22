@@ -5,12 +5,74 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://shvwloynixadgdcuxtgk.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNodndsb3luaXhhZGdkY3V4dGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODE0MDYsImV4cCI6MjEwMjk1NzQwNn0.OHYUmNjJuqsKdaxrReWnHiW73VmDHEp8pcjMm4i9Mfo';
 
-const ROLES = ['tech', 'tech senior', 'marketing', 'sales', 'CA', 'lawyer', 'finance', 'doctor', 'others', 'NA'];
+const ROLES = [
+  'tech',
+  'tech_senior',
+  'founder',
+  'investor',
+  'vc',
+  'finance',
+  'consultant',
+  'ca',
+  'lawyer',
+  'doctor',
+  'designer',
+  'marketing',
+  'sales',
+  'government',
+  'academia',
+  'student',
+  'creator',
+  'other',
+  'unknown'
+];
 const LOCATIONS = ['India', 'USA', 'UK', 'Canada', 'Australia', 'Singapore', 'Germany', 'France', 'UAE', 'Other'];
-const MET_AT = ['party', 'college', 'school', 'company', 'others'];
-const INTERACTION_TYPES = ['reels', 'twitter', 'whatsapp', 'call', 'meet_up', 'diwali', 'birthday_wish', 'warm', 'dormant'];
-const INTENTS = ['friend', 'emulate', 'connection', 'family', 'connector'];
-
+const MET_AT = [
+  'school',
+  'college',
+  'university',
+  'company',
+  'previous_company',
+  'internship',
+  'conference',
+  'meetup',
+  'party',
+  'sports',
+  'online',
+  'mutual_friend',
+  'family',
+  'travel',
+  'community',
+  'other'
+];
+const INTERACTION_TYPES = [
+  'message',
+  'call',
+  'meetup',
+  'birthday_wish',
+  'festival_wish',
+  'reel_share',
+  'post_share',
+  'work',
+  'introduction',
+  'help',
+  'invitation',
+  'other'
+];
+const INTENTS = [
+  'friendship',
+  'professional',
+  'mentorship',
+  'mentee',
+  'emulation',
+  'collaboration',
+  'business',
+  'networking',
+  'family',
+  'romantic',
+  'connector',
+  'community'
+];
 const injectStyles = () => {
   if (document.getElementById('editorial-styles')) return;
   const style = document.createElement('style');
@@ -71,7 +133,7 @@ const MultiSelect = ({ options, selected = [], onChange, placeholder }) => {
 
   return (
     <div className="relative" ref={containerRef}>
-      <div 
+      <div
         className="w-full bg-transparent border-b border-[#D1CEC7] py-2 cursor-pointer flex flex-wrap gap-1 items-center min-h-[38px] transition-colors hover:border-[#2C2A25]"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -86,11 +148,11 @@ const MultiSelect = ({ options, selected = [], onChange, placeholder }) => {
           ))
         )}
       </div>
-      
+
       {isOpen && (
         <div className="absolute top-full left-0 w-full mt-1 bg-[#FDFBF7] border border-[#E6E2D8] shadow-lg z-50 max-h-48 overflow-y-auto rounded-sm">
           {options.map(option => (
-            <div 
+            <div
               key={option}
               className="px-3 py-2 text-sm font-body cursor-pointer hover:bg-[#F4F1EA] flex justify-between items-center text-[#2C2A25]"
               onClick={() => toggleOption(option)}
@@ -138,7 +200,7 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
   if (!isOpen) return null;
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name) return;
@@ -156,7 +218,7 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
           <h2 className="font-display text-2xl text-[#2C2A25] italic">{person ? 'Edit Profile' : 'New Entry'}</h2>
           <button onClick={onClose} className="text-[#8C877D] hover:text-[#2C2A25] transition-colors"><Icons.X /></button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8">
           <div className="col-span-1 md:col-span-2">
             <Label>Full Name *</Label>
@@ -216,10 +278,10 @@ const PersonModal = ({ isOpen, onClose, onSave, person = null }) => {
 
           <div className="col-span-1 md:col-span-2">
             <Label>Intent Tags</Label>
-            <MultiSelect 
-              options={INTENTS} 
-              selected={formData.intent} 
-              onChange={(newIntents) => setFormData({...formData, intent: newIntents})}
+            <MultiSelect
+              options={INTENTS}
+              selected={formData.intent}
+              onChange={(newIntents) => setFormData({ ...formData, intent: newIntents })}
               placeholder="Select strategic intents..."
             />
           </div>
@@ -240,10 +302,10 @@ export default function NetworkRolodex() {
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(true);
   const [supabaseClient, setSupabaseClient] = useState(null);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPerson, setEditingPerson] = useState(null);
-  
+
   // Filters and Sorting State
   const [searchTerm, setSearchTerm] = useState('');
   const [filterIntent, setFilterIntent] = useState('');
@@ -252,7 +314,7 @@ export default function NetworkRolodex() {
 
   useEffect(() => {
     injectStyles();
-    
+
     // Initialize Supabase Client directly with imported package or fallback
     try {
       const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -288,13 +350,13 @@ export default function NetworkRolodex() {
         .order('last_interaction', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
-      
+
       // Parse the intent string back to an array for the UI if it exists
       const parsedData = (data || []).map(person => ({
         ...person,
         intent: person.intent ? (Array.isArray(person.intent) ? person.intent : person.intent.split(',')) : []
       }));
-      
+
       setPeople(parsedData);
     } catch (err) {
       console.error("Error fetching people:", err);
@@ -309,7 +371,7 @@ export default function NetworkRolodex() {
     try {
       // Map form data to database schema
       // Note: first_met must be a date string (YYYY-MM-DD), last_interaction must be an ISO timestamp
-      
+
       const payload = {
         name: personData.name,
         company: personData.company || null,
@@ -329,17 +391,17 @@ export default function NetworkRolodex() {
           .from('people')
           .update(payload)
           .eq('id', personData.id);
-          
+
         if (error) throw error;
       } else {
         // Add new
         const { error } = await supabaseClient
           .from('people')
           .insert([payload]);
-          
+
         if (error) throw error;
       }
-      
+
       setIsModalOpen(false);
       setEditingPerson(null);
       fetchPeople(); // Refresh the list
@@ -356,7 +418,7 @@ export default function NetworkRolodex() {
         .from('people')
         .delete()
         .eq('id', id);
-        
+
       if (error) throw error;
       fetchPeople(); // Refresh the list
     } catch (err) {
@@ -398,10 +460,10 @@ export default function NetworkRolodex() {
       if (sortBy === 'name_asc') {
         return a.name.localeCompare(b.name);
       }
-      
+
       const dateA = a.last_interaction ? new Date(a.last_interaction).getTime() : 0;
       const dateB = b.last_interaction ? new Date(b.last_interaction).getTime() : 0;
-      
+
       if (sortBy === 'recent_interaction') {
         return dateB - dateA;
       }
@@ -416,7 +478,7 @@ export default function NetworkRolodex() {
 
   return (
     <div className="min-h-screen paper-texture font-body text-[#2C2A25] selection:bg-[#E6E2D8] selection:text-[#1A1815]">
-      
+
       {/* Top Header / Navigation */}
       <header className="border-b-2 border-[#E6E2D8] bg-[#FDFBF7]/80 backdrop-blur sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -424,7 +486,7 @@ export default function NetworkRolodex() {
             <h1 className="font-display text-3xl font-semibold tracking-wide italic text-[#1A1815]">The Network</h1>
             <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C877D] font-display font-bold">Personal Archive</span>
           </div>
-          <button 
+          <button
             onClick={openNewModal}
             className="flex items-center gap-2 bg-[#1A1815] text-[#FDFBF7] px-5 py-2.5 rounded-sm font-display text-lg shadow-[0_2px_10px_-4px_rgba(0,0,0,0.5)] hover:bg-[#2C2A25] transition-all hover:-translate-y-0.5 cursor-pointer"
           >
@@ -435,16 +497,16 @@ export default function NetworkRolodex() {
 
       {/* Main Content Area */}
       <main className="max-w-6xl mx-auto px-6 py-10 flex gap-10 flex-col lg:flex-row items-start">
-        
+
         {/* Left Sidebar - Filters */}
         <aside className="w-full lg:w-64 flex-shrink-0 sticky top-28 space-y-8 border-r border-[#E6E2D8] pr-8 hidden md:block">
           <div>
             <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4 flex items-center gap-2">
               <Icons.Search /> Search
             </h3>
-            <input 
-              type="text" 
-              placeholder="Name or company..." 
+            <input
+              type="text"
+              placeholder="Name or company..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors"
@@ -470,45 +532,45 @@ export default function NetworkRolodex() {
           </div>
 
           <div>
-             <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Role</h3>
-             <select 
-               value={filterRole} 
-               onChange={(e) => setFilterRole(e.target.value)}
-               className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors capitalize cursor-pointer"
-             >
-               <option value="">All Roles</option>
-               {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-             </select>
+            <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Role</h3>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors capitalize cursor-pointer"
+            >
+              <option value="">All Roles</option>
+              {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
           </div>
-          
+
           <div>
-             <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Order Archive</h3>
-             <select 
-               value={sortBy} 
-               onChange={(e) => setSortBy(e.target.value)}
-               className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors cursor-pointer"
-             >
-               <option value="recent_interaction">Most Recent Interaction</option>
-               <option value="oldest_interaction">Oldest Interaction</option>
-               <option value="name_asc">Alphabetical (A-Z)</option>
-             </select>
+            <h3 className="text-xs uppercase tracking-[0.2em] text-[#8C877D] font-display font-bold mb-4">Order Archive</h3>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none focus:border-[#1A1815] transition-colors cursor-pointer"
+            >
+              <option value="recent_interaction">Most Recent Interaction</option>
+              <option value="oldest_interaction">Oldest Interaction</option>
+              <option value="name_asc">Alphabetical (A-Z)</option>
+            </select>
           </div>
         </aside>
 
         {/* Mobile Filters (Simplified) */}
         <div className="w-full md:hidden flex gap-4 overflow-x-auto pb-4 border-b border-[#E6E2D8]">
-           <input 
-              type="text" 
-              placeholder="Search..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="min-w-[150px] flex-1 bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none"
-            />
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent border-b border-[#D1CEC7] text-sm py-1.5">
-               <option value="recent_interaction">Sort: Recent</option>
-               <option value="oldest_interaction">Sort: Oldest</option>
-               <option value="name_asc">Sort: A-Z</option>
-            </select>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="min-w-[150px] flex-1 bg-transparent border-b border-[#D1CEC7] py-1.5 text-sm focus:outline-none"
+          />
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="bg-transparent border-b border-[#D1CEC7] text-sm py-1.5">
+            <option value="recent_interaction">Sort: Recent</option>
+            <option value="oldest_interaction">Sort: Oldest</option>
+            <option value="name_asc">Sort: A-Z</option>
+          </select>
         </div>
 
         {/* Right Content - Grid */}
@@ -522,7 +584,7 @@ export default function NetworkRolodex() {
             <div className="text-center py-20 border border-dashed border-[#D1CEC7] bg-[#FDFBF7]/50 rounded-sm">
               <h2 className="font-display text-2xl italic text-[#706B62] mb-2">No entries found</h2>
               <p className="text-sm text-[#A39E93] mb-4">Adjust your filters or add a new person to your network.</p>
-              <button 
+              <button
                 onClick={openNewModal}
                 className="inline-flex items-center gap-2 bg-[#1A1815] text-[#FDFBF7] px-4 py-2 rounded-sm font-display text-base hover:bg-[#2C2A25] transition-colors cursor-pointer"
               >
@@ -533,7 +595,7 @@ export default function NetworkRolodex() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {processedPeople.map(person => (
                 <div key={person.id} className="group relative bg-[#FDFBF7] border border-[#E6E2D8] p-6 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 rounded-sm">
-                  
+
                   {/* Actions overlay */}
                   <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <button onClick={() => openEditModal(person)} className="p-1.5 text-[#8C877D] hover:text-[#1A1815] hover:bg-[#F4F1EA] transition-colors rounded-sm cursor-pointer" title="Edit"><Icons.Edit /></button>
@@ -554,12 +616,12 @@ export default function NetworkRolodex() {
                     )}
                     {person.first_met && (
                       <div className="flex items-center gap-2 text-xs text-[#8C877D]">
-                        <Icons.Calendar /> First met: {new Date(person.first_met).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric'})} {person.met_at ? `(${person.met_at})` : ''}
+                        <Icons.Calendar /> First met: {new Date(person.first_met).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })} {person.met_at ? `(${person.met_at})` : ''}
                       </div>
                     )}
                     {person.last_interaction && (
                       <div className="flex items-center gap-2 text-xs text-[#706B62]">
-                        <Icons.Calendar /> Last contact: {new Date(person.last_interaction).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric'})}
+                        <Icons.Calendar /> Last contact: {new Date(person.last_interaction).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                       </div>
                     )}
                   </div>
@@ -581,11 +643,11 @@ export default function NetworkRolodex() {
       </main>
 
       {/* Modals */}
-      <PersonModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={handleSave} 
-        person={editingPerson} 
+      <PersonModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        person={editingPerson}
       />
     </div>
   );
