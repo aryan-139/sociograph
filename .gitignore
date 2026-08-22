@@ -1,0 +1,59 @@
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+# Compiled binaries
+backend/bin/
+backend/dist/
+
+# go build output (any binary at root of a package dir)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go workspace file (local-only multi-module setups)
+go.work
+go.work.sum
+
+# Dependency vendor dir (only if you pin via go.sum and don't vendor)
+# vendor/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── Editors & IDEs ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# ── Logs & Temp ───────────────────────────────────────────────────────────────
+*.log
+tmp/
+temp/
+
+# ── Agent / Tooling ──────────────────────────────────────────────────────────
+# Antigravity IDE internal files (not project code)
+.gemini/
